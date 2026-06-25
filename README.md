@@ -106,15 +106,9 @@ Hasil prediksi ditampilkan dengan probabilitas dalam format persentase.
 - Pillow >= 10.0
 
 ## Team
-Anggota 1
-       - 2301010
-Anggota 2
-       - 2301010
-Anggota 3
-       - 2301010
-Anggota 4
-       - 2301010
-Anggota 5
-       - 2301010
-Anggota 6
-       - 2301010
+- Erlangga Syafutra - 2301010192
+- Erlangga Syafutra - 2301010192
+- Erlangga Syafutra - 2301010192
+- Erlangga Syafutra - 2301010192
+- Erlangga Syafutra - 2301010192
+- Erlangga Syafutra - 2301010192
