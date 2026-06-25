@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Prediction</h1>
+  <hr/>
+  <form method="post" action="/prediction">
+    <div class="mb-3">
+      <label class="form-label">Model</label>
+      <select name="model" class="form-select">
+        <option value="All Models" selected>All Models</option>
+        <option value="KNN">KNN</option>
+        <option value="Random Forest">Random Forest</option>
+        <option value="Voting Classifier">Voting Classifier</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Gender</label>
+        <select name="gender" class="form-select">
+          <option value="1">Laki-laki</option>
+          <option value="0" selected>Perempuan</option>
+        </select>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Hemoglobin</label>
+        <input name="hemoglobin" type="number" step="0.01" class="form-control" value="13.0">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">MCH</label>
+        <input name="mch" type="number" step="0.01" class="form-control" value="25.0">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">MCHC</label>
+        <input name="mchc" type="number" step="0.01" class="form-control" value="30.0">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">MCV</label>
+        <input name="mcv" type="number" step="0.01" class="form-control" value="80.0">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Prediksi Risiko Anemia</button>
+  </form>
+
+  {% if results %}
+    <hr/>
+    <h3>Hasil Prediksi</h3>
+    {% if results_all %}
+      <div class="row">
+        {% for model, res in results.items() %}
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ model }}</h5>
+                <p class="card-text">Prediksi: <strong>{{ res.label }}</strong></p>
+                <p class="card-text">Probabilitas: {{ (res.proba[1]*100) | round(2) }}% (class 1)</p>
+                <p class="card-text text-muted">Raw: [{{ '%.4f' % res.proba[0] }}, {{ '%.4f' % res.proba[1] }}]</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ results.model }}</h5>
+          <p class="card-text">Prediksi: <strong>{{ results.label }}</strong></p>
+          <p class="card-text">Probabilitas: {{ (results.proba[1]*100) | round(2) }}% (class 1)</p>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+
+{% endblock %}

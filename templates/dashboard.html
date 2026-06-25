@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>History Prediksi</h1>
+  <div class="d-flex justify-content-between align-items-center">
+    <p class="text-muted mb-0">Riwayat prediksi untuk akun: <strong>{{ current_user.username }}</strong></p>
+    <a href="{{ url_for('download_history') }}" class="btn btn-black">Download CSV</a>
+  </div>
+  <hr/>
+  {% if history and history|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-sm table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Waktu</th>
+            <th>Model</th>
+            <th>Gender</th>
+            <th>Hemoglobin</th>
+            <th>MCH</th>
+            <th>MCHC</th>
+            <th>MCV</th>
+            <th>Prediksi</th>
+            <th>Probabilitas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in history %}
+            <tr>
+              <td>{{ row.timestamp }}</td>
+              <td><span class="badge bg-dark">{{ row.model }}</span></td>
+              <td>{{ row.gender }}</td>
+              <td>{{ row.hemoglobin }}</td>
+              <td>{{ row.mch }}</td>
+              <td>{{ row.mchc }}</td>
+              <td>{{ row.mcv }}</td>
+              <td><strong>{{ row.prediction }}</strong></td>
+              <td><small>{{ row.probability }}</small></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-muted mt-3">Total prediksi: <strong>{{ history|length }}</strong></p>
+  {% else %}
+    <div class="alert alert-info">Belum ada riwayat prediksi. Lakukan prediksi pada halaman Prediction.</div>
+  {% endif %}
+{% endblock %}

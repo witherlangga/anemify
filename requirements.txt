@@ -1,0 +1,12 @@
+pillow
+flask
+flask-sqlalchemy
+flask-login
+pymysql
+pandas
+numpy
+scikit-learn
+joblib
+matplotlib
+seaborn
+werkzeug

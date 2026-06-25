@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Edit Profile</h1>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input name="username" class="form-control" value="{{ current_user.username }}" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input name="email" class="form-control" value="{{ current_user.email }}" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Profile Image</label>
+          <input type="file" name="profile_image" class="form-control" accept="image/*" />
+        </div>
+        <button class="btn btn-black">Save</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
