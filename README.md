@@ -92,18 +92,18 @@ Hasil prediksi ditampilkan dengan probabilitas dalam format persentase.
 
 ## Dependencies
 
-- Flask >= 3.1
-- Flask-SQLAlchemy >= 3.1
-- Flask-Login >= 0.6
-- PyMySQL >= 1.1
-- Werkzeug >= 3.0
-- pandas >= 2.0
-- numpy >= 1.24
-- scikit-learn >= 1.9
-- joblib >= 1.4
-- matplotlib >= 3.7
-- seaborn >= 0.13
-- Pillow >= 10.0
+- Flask
+- Flask-SQLAlchemy
+- Flask-Login
+- PyMySQL
+- Werkzeug 
+- pandas 
+- numpy
+- scikit-learn
+- joblib
+- matplotlib
+- seaborn
+- Pillow
 
 ## Team
 - Erlangga Syafutra - 2301010192

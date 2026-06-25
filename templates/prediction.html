@@ -56,7 +56,8 @@
               <div class="card-body">
                 <h5 class="card-title">{{ model }}</h5>
                 <p class="card-text">Prediksi: <strong>{{ res.label }}</strong></p>
-                <p class="card-text">Probabilitas: {{ (res.proba[1]*100) | round(2) }}% (class 1)</p>
+                <p class="card-text">Probabilitas Berisiko Anemia: {{ (res.proba[1]*100) | round(2) }}%</p>
+                <p class="card-text">Probabilitas Tidak Berisiko Anemia: {{ (res.proba[0]*100) | round(2) }}%</p>
                 <p class="card-text text-muted">Raw: [{{ '%.4f' % res.proba[0] }}, {{ '%.4f' % res.proba[1] }}]</p>
               </div>
             </div>
@@ -68,7 +69,8 @@
         <div class="card-body">
           <h5 class="card-title">{{ results.model }}</h5>
           <p class="card-text">Prediksi: <strong>{{ results.label }}</strong></p>
-          <p class="card-text">Probabilitas: {{ (results.proba[1]*100) | round(2) }}% (class 1)</p>
+          <p class="card-text">Probabilitas Berisiko Anemia: {{ (results.proba[1]*100) | round(2) }}%</p>
+          <p class="card-text">Probabilitas Tidak Berisiko Anemia: {{ (results.proba[0]*100) | round(2) }}%</p>
         </div>
       </div>
     {% endif %}

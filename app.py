@@ -1,71 +1,56 @@
-try:
-    from flask import Flask, render_template, request, redirect, url_for, flash, make_response
-    from flask_sqlalchemy import SQLAlchemy
-    from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-    from werkzeug.security import generate_password_hash, check_password_hash
-    Flask_available = True
-except Exception as e:
-    Flask = None
-    Flask_available = False
-    print(f"Flask import error: {e}")
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from utils import prediction as prediction_service
 
-if Flask_available:
-    app = Flask(__name__)
-    
-    # Database configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/anemiadb'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
-    
-    db = SQLAlchemy(app)
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-    login_manager.login_view = 'login'
-    
-    # User model
-    class User(UserMixin, db.Model):
-        id = db.Column(db.Integer, primary_key=True)
-        username = db.Column(db.String(80), unique=True, nullable=False)
-        email = db.Column(db.String(120), unique=True, nullable=False)
-        password_hash = db.Column(db.String(255), nullable=False)
-        predictions = db.relationship('PredictionRecord', backref='user', lazy=True, cascade='all, delete-orphan')
-        profile_image = db.Column(db.String(255), nullable=True)
-        
-        def set_password(self, password):
-            self.password_hash = generate_password_hash(password)
-        
-        def check_password(self, password):
-            return check_password_hash(self.password_hash, password)
-    
-    # Prediction model
-    class PredictionRecord(db.Model):
-        id = db.Column(db.Integer, primary_key=True)
-        user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-        timestamp = db.Column(db.DateTime, default=lambda: __import__('datetime').datetime.now())
-        model_name = db.Column(db.String(50), nullable=False)
-        gender = db.Column(db.Integer, nullable=False)
-        hemoglobin = db.Column(db.Float, nullable=False)
-        mch = db.Column(db.Float, nullable=False)
-        mchc = db.Column(db.Float, nullable=False)
-        mcv = db.Column(db.Float, nullable=False)
-        prediction_label = db.Column(db.String(50), nullable=False)
-        probability_proba = db.Column(db.String(255), nullable=True)  # Store as JSON string
-    
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-    
-    # Create tables only when explicitly needed (in __main__ or init_db script)
-    
-else:
-    app = None
-    db = None
+app = Flask(__name__)
 
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/anemiadb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 
-if app is not None:
-    @app.route('/register', methods=['GET', 'POST'])
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# User model
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    predictions = db.relationship('PredictionRecord', backref='user', lazy=True, cascade='all, delete-orphan')
+    profile_image = db.Column(db.String(255), nullable=True)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+# Prediction model
+class PredictionRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=lambda: __import__('datetime').datetime.now())
+    model_name = db.Column(db.String(50), nullable=False)
+    gender = db.Column(db.Integer, nullable=False)
+    hemoglobin = db.Column(db.Float, nullable=False)
+    mch = db.Column(db.Float, nullable=False)
+    mchc = db.Column(db.Float, nullable=False)
+    mcv = db.Column(db.Float, nullable=False)
+    prediction_label = db.Column(db.String(50), nullable=False)
+    probability_proba = db.Column(db.String(255), nullable=True)  # Store as JSON string
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/register', methods=['GET', 'POST'])
     def register():
         if current_user.is_authenticated:
             return redirect(url_for('home'))
