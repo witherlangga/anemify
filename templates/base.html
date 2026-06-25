@@ -32,6 +32,23 @@
         border-color: #111111 !important;
         color: #ffffff !important;
       }
+      .navbar-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #000000;
+      }
+      .navbar-avatar-placeholder {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1px solid #000000;
+      }
     </style>
   </head>
   <body>
@@ -54,11 +71,17 @@
             {% if current_user.is_authenticated %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M13.468 12.37C12.758 11.226 11.48 10.5 10 10.5H6c-1.48 0-2.758.726-3.468 1.87A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
-                  <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                  <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/>
-                </svg>
+                {% if current_user.profile_image %}
+                  <img src="/{{ current_user.profile_image }}" alt="Profile" class="navbar-avatar me-2">
+                {% else %}
+                  <span class="navbar-avatar-placeholder me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                      <path d="M2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/>
+                    </svg>
+                  </span>
+                {% endif %}
+                {{ current_user.username }}
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileMenu">
                 <li><a class="dropdown-item" href="/profile">Profile</a></li>

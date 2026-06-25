@@ -1,56 +1,71 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+try:
+    from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+    from flask_sqlalchemy import SQLAlchemy
+    from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+    from werkzeug.security import generate_password_hash, check_password_hash
+    Flask_available = True
+except Exception as e:
+    Flask = None
+    Flask_available = False
+    print(f"Flask import error: {e}")
 
 from utils import prediction as prediction_service
 
-app = Flask(__name__)
+if Flask_available:
+    app = Flask(__name__)
+    
+    # Database configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/anemiadb'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
+    
+    db = SQLAlchemy(app)
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
+    
+    # User model
+    class User(UserMixin, db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        username = db.Column(db.String(80), unique=True, nullable=False)
+        email = db.Column(db.String(120), unique=True, nullable=False)
+        password_hash = db.Column(db.String(255), nullable=False)
+        predictions = db.relationship('PredictionRecord', backref='user', lazy=True, cascade='all, delete-orphan')
+        profile_image = db.Column(db.String(255), nullable=True)
+        
+        def set_password(self, password):
+            self.password_hash = generate_password_hash(password)
+        
+        def check_password(self, password):
+            return check_password_hash(self.password_hash, password)
+    
+    # Prediction model
+    class PredictionRecord(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+        timestamp = db.Column(db.DateTime, default=lambda: __import__('datetime').datetime.now())
+        model_name = db.Column(db.String(50), nullable=False)
+        gender = db.Column(db.Integer, nullable=False)
+        hemoglobin = db.Column(db.Float, nullable=False)
+        mch = db.Column(db.Float, nullable=False)
+        mchc = db.Column(db.Float, nullable=False)
+        mcv = db.Column(db.Float, nullable=False)
+        prediction_label = db.Column(db.String(50), nullable=False)
+        probability_proba = db.Column(db.String(255), nullable=True)  # Store as JSON string
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+    
+    # Create tables only when explicitly needed (in __main__ or init_db script)
+    
+else:
+    app = None
+    db = None
 
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/anemiadb'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 
-db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-# User model
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    predictions = db.relationship('PredictionRecord', backref='user', lazy=True, cascade='all, delete-orphan')
-    profile_image = db.Column(db.String(255), nullable=True)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-# Prediction model
-class PredictionRecord(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, default=lambda: __import__('datetime').datetime.now())
-    model_name = db.Column(db.String(50), nullable=False)
-    gender = db.Column(db.Integer, nullable=False)
-    hemoglobin = db.Column(db.Float, nullable=False)
-    mch = db.Column(db.Float, nullable=False)
-    mchc = db.Column(db.Float, nullable=False)
-    mcv = db.Column(db.Float, nullable=False)
-    prediction_label = db.Column(db.String(50), nullable=False)
-    probability_proba = db.Column(db.String(255), nullable=True)  # Store as JSON string
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-@app.route('/register', methods=['GET', 'POST'])
+if app is not None:
+    @app.route('/register', methods=['GET', 'POST'])
     def register():
         if current_user.is_authenticated:
             return redirect(url_for('home'))
@@ -128,27 +143,65 @@ def load_user(user_id):
     def prediction():
         if request.method == 'POST':
             import json
+            import traceback
             from datetime import datetime
             
-            model = request.form.get('model')
-            gender = int(request.form.get('gender'))
-            hemoglobin = float(request.form.get('hemoglobin') or 0)
-            mch = float(request.form.get('mch') or 0)
-            mchc = float(request.form.get('mchc') or 0)
-            mcv = float(request.form.get('mcv') or 0)
+            try:
+                model = request.form.get('model')
+                gender = int(request.form.get('gender'))
+                hemoglobin = float(request.form.get('hemoglobin') or 0)
+                mch = float(request.form.get('mch') or 0)
+                mchc = float(request.form.get('mchc') or 0)
+                mcv = float(request.form.get('mcv') or 0)
 
-            if model == 'All Models':
-                raw = prediction_service.predict_all(gender, hemoglobin, mch, mchc, mcv)
-                results = {}
-                for k, v in raw.items():
-                    label = prediction_service.get_prediction_label(v['prediction'])
-                    results[k] = {'label': label, 'proba': v['proba']}
+                if model == 'All Models':
+                    raw = prediction_service.predict_all(gender, hemoglobin, mch, mchc, mcv)
+                    results = {}
+                    for k, v in raw.items():
+                        if hasattr(v['proba'], 'tolist'):
+                            v['proba'] = v['proba'].tolist()
+                        label = prediction_service.get_prediction_label(v['prediction'])
+                        results[k] = {'label': label, 'proba': v['proba']}
+                        # Save to database
+                        try:
+                            proba_str = json.dumps(v['proba'])
+                            pred_record = PredictionRecord(
+                                user_id=current_user.id,
+                                model_name=k,
+                                gender=gender,
+                                hemoglobin=hemoglobin,
+                                mch=mch,
+                                mchc=mchc,
+                                mcv=mcv,
+                                prediction_label=label,
+                                probability_proba=proba_str
+                            )
+                            db.session.add(pred_record)
+                        except Exception as e:
+                            app.logger.exception('Error saving prediction for all models')
+                    
+                    db.session.commit()
+                    return render_template('prediction.html', active='prediction', results=results, results_all=True)
+                else:
+                    pred = prediction_service.predict(model, gender, hemoglobin, mch, mchc, mcv)
+                    if model == 'KNN':
+                        proba = prediction_service.predict_proba_knn(gender, hemoglobin, mch, mchc, mcv)
+                    elif model == 'Random Forest':
+                        proba = prediction_service.predict_proba_rf(gender, hemoglobin, mch, mchc, mcv)
+                    else:
+                        proba = prediction_service.predict_proba_voting(gender, hemoglobin, mch, mchc, mcv)
+
+                    if hasattr(proba, 'tolist'):
+                        proba = proba.tolist()
+
+                    label = prediction_service.get_prediction_label(pred)
+                    
                     # Save to database
                     try:
-                        proba_str = json.dumps(v['proba'])
+                        proba_str = json.dumps(proba)
                         pred_record = PredictionRecord(
                             user_id=current_user.id,
-                            model_name=k,
+                            model_name=model,
                             gender=gender,
                             hemoglobin=hemoglobin,
                             mch=mch,
@@ -158,43 +211,15 @@ def load_user(user_id):
                             probability_proba=proba_str
                         )
                         db.session.add(pred_record)
+                        db.session.commit()
                     except Exception as e:
-                        print(f"Error saving prediction: {e}")
-                
-                db.session.commit()
-                return render_template('prediction.html', active='prediction', results=results, results_all=True)
-            else:
-                pred = prediction_service.predict(model, gender, hemoglobin, mch, mchc, mcv)
-                if model == 'KNN':
-                    proba = prediction_service.predict_proba_knn(gender, hemoglobin, mch, mchc, mcv)
-                elif model == 'Random Forest':
-                    proba = prediction_service.predict_proba_rf(gender, hemoglobin, mch, mchc, mcv)
-                else:
-                    proba = prediction_service.predict_proba_voting(gender, hemoglobin, mch, mchc, mcv)
-
-                label = prediction_service.get_prediction_label(pred)
-                
-                # Save to database
-                try:
-                    import json
-                    proba_str = json.dumps(proba)
-                    pred_record = PredictionRecord(
-                        user_id=current_user.id,
-                        model_name=model,
-                        gender=gender,
-                        hemoglobin=hemoglobin,
-                        mch=mch,
-                        mchc=mchc,
-                        mcv=mcv,
-                        prediction_label=label,
-                        probability_proba=proba_str
-                    )
-                    db.session.add(pred_record)
-                    db.session.commit()
-                except Exception as e:
-                    print(f"Error saving prediction: {e}")
-                
-                return render_template('prediction.html', active='prediction', results={'model':model,'label':label,'proba':proba}, results_all=False)
+                        app.logger.exception('Error saving prediction')
+                    
+                    return render_template('prediction.html', active='prediction', results={'model':model,'label':label,'proba':proba}, results_all=False)
+            except Exception as e:
+                app.logger.exception('Prediction route failed')
+                error_message = str(e)
+                return render_template('prediction.html', active='prediction', error=error_message)
 
         return render_template('prediction.html', active='prediction')
 

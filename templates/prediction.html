@@ -45,6 +45,11 @@
     <button type="submit" class="btn btn-primary">Prediksi Risiko Anemia</button>
   </form>
 
+  {% if error %}
+    <div class="alert alert-danger" role="alert">
+      Terjadi kesalahan saat memproses prediksi: {{ error }}
+    </div>
+  {% endif %}
   {% if results %}
     <hr/>
     <h3>Hasil Prediksi</h3>
