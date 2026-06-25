@@ -28,10 +28,26 @@ cd anemify
 ### 2. Setup Virtual Environment
 
 Windows:
-```bash
+```powershell
 python -m venv venv
-.\venv\Scripts\Activate.ps1
 ```
+Aktifkan environment:
+- Jika menggunakan PowerShell dan eksekusi skrip diizinkan:
+  ```powershell
+  .\venv\Scripts\Activate.ps1
+  ```
+- Jika PowerShell memblokir skrip (error execution policy), jalankan terlebih dahulu:
+  ```powershell
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+  ```
+  lalu coba lagi:
+  ```powershell
+  .\venv\Scripts\Activate.ps1
+  ```
+- Alternatif jika tidak ingin mengubah kebijakan PowerShell:
+  ```cmd
+  .\venv\Scripts\activate.bat
+  ```
 
 macOS/Linux:
 ```bash
