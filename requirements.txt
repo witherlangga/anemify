@@ -3,6 +3,7 @@ flask
 flask-sqlalchemy
 flask-login
 pymysql
+python-dotenv
 pandas
 numpy
 scikit-learn

@@ -1,14 +1,142 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Prediksi Risiko Anemia</h1>
-  <p class="text-muted">Prediksi risiko anemia menggunakan model Machine Learning</p>
-  <hr/>
-  <h3>Instruksi</h3>
-  <ol>
-    <li>Buka halaman <strong>Prediction</strong>.</li>
-    <li>Masukkan data pasien.</li>
-    <li>Pilih model (default: All Models).</li>
-    <li>Tekan tombol <strong>Prediksi Risiko Anemia</strong>.</li>
-  </ol>
-  <a class="btn btn-primary" href="/prediction">Buka Halaman Prediction</a>
+<div class="row align-items-center gy-5 py-3">
+  <!-- Hero Left -->
+  <div class="col-lg-6">
+    <div class="pe-lg-4">
+      <span class="badge bg-cyan-subtle text-primary border border-info-subtle px-3 py-2 rounded-pill font-heading mb-3 d-inline-flex align-items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        AI Healthcare Diagnostic Assistant
+      </span>
+      <h1 class="display-5 fw-bold text-slate-900 mb-3 lh-sm">
+        Prediksi Risiko Anemia Akurat & Cepat dengan Machine Learning
+      </h1>
+      <p class="lead text-muted mb-4 fs-6">
+        Anemify menganalisis kadar Hemoglobin, MCH, MCHC, dan MCV pasien menggunakan gabungan algoritma modern seperti KNN, Random Forest, dan Voting Classifier untuk deteksi dini secara presisi.
+      </p>
+      <div class="d-flex flex-wrap gap-3 mb-4">
+        <a href="/prediction" class="btn-custom-primary text-decoration-none fs-6 px-4 py-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><activity/><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Mulai Prediksi Sekarang
+        </a>
+        <a href="/about" class="btn-custom-outline text-decoration-none fs-6 px-4 py-3">
+          Pelajari Metodologi
+        </a>
+      </div>
+      
+      <div class="row g-3 border-top pt-4 mt-2">
+        <div class="col-4">
+          <div class="fw-bold fs-4 text-slate-900 font-heading">3+</div>
+          <div class="text-muted small">Model ML Aktif</div>
+        </div>
+        <div class="col-4">
+          <div class="fw-bold fs-4 text-slate-900 font-heading">4</div>
+          <div class="text-muted small">Parameter Hematologi</div>
+        </div>
+        <div class="col-4">
+          <div class="fw-bold fs-4 text-slate-900 font-heading">100%</div>
+          <div class="text-muted small">Tanpa Login / Bebas Akses</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Right Graphic Card -->
+  <div class="col-lg-6">
+    <div class="card-custom p-4 p-md-5 position-relative overflow-hidden bg-white">
+      <div class="position-absolute top-0 end-0 p-3 opacity-10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="1"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      
+      <h3 class="h4 mb-4 font-heading text-slate-900 d-flex align-items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+        Alur Pemeriksaan Mandiri
+      </h3>
+
+      <div class="d-flex flex-column gap-4">
+        <div class="d-flex gap-3 align-items-start">
+          <div class="rounded-circle bg-cyan-subtle text-primary p-2 px-3 fw-bold font-heading">1</div>
+          <div>
+            <h6 class="mb-1 fw-bold text-slate-900">Buka Halaman Prediksi</h6>
+            <p class="text-muted small mb-0">Klik tombol prediksi untuk menuju form pengisian parameter darah.</p>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start">
+          <div class="rounded-circle bg-cyan-subtle text-primary p-2 px-3 fw-bold font-heading">2</div>
+          <div>
+            <h6 class="mb-1 fw-bold text-slate-900">Input Data Sampel Darah</h6>
+            <p class="text-muted small mb-0">Masukkan nilai Hemoglobin, MCH, MCHC, MCV serta jenis kelamin pasien.</p>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start">
+          <div class="rounded-circle bg-cyan-subtle text-primary p-2 px-3 fw-bold font-heading">3</div>
+          <div>
+            <h6 class="mb-1 fw-bold text-slate-900">Pilih Model Klastering / Klassifikasi</h6>
+            <p class="text-muted small mb-0">Pilih model KNN, Random Forest, Voting Classifier, atau lansung semua model sekaligus.</p>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start">
+          <div class="rounded-circle bg-emerald-subtle text-emerald p-2 px-3 fw-bold font-heading" style="background:#d1fae5; color:#059669;">4</div>
+          <div>
+            <h6 class="mb-1 fw-bold text-slate-900">Dapatkan Evaluasi Probabilitas</h6>
+            <p class="text-muted small mb-0">Hasil dikalkulasi secara realtime lengkap dengan grafik dan opsi unduh riwayat.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Parameter Cards Section -->
+<div class="mt-5 pt-4">
+  <div class="text-center max-w-xl mx-auto mb-5">
+    <h2 class="h3 font-heading text-slate-900">4 Parameter Utama Pemeriksaan</h2>
+    <p class="text-muted">Anemify mengevaluasi indeks eritrosit medis penting untuk menentukan karakteristik sel darah merah.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card-custom p-4 h-100">
+        <div class="badge bg-danger-subtle text-danger p-2 rounded-3 mb-3 d-inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+        </div>
+        <h5 class="fw-bold mb-2">Hemoglobin (Hb)</h5>
+        <p class="text-muted small mb-0">Protein kaya zat besi dalam sel darah merah yang bertugas membawa oksigen ke seluruh tubuh.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card-custom p-4 h-100">
+        <div class="badge bg-warning-subtle text-warning p-2 rounded-3 mb-3 d-inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+        </div>
+        <h5 class="fw-bold mb-2">MCH</h5>
+        <p class="text-muted small mb-0">Mean Corpuscular Hemoglobin: jumlah rata-rata hemoglobin di dalam setiap sel darah merah.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card-custom p-4 h-100">
+        <div class="badge bg-info-subtle text-info p-2 rounded-3 mb-3 d-inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+        </div>
+        <h5 class="fw-bold mb-2">MCHC</h5>
+        <p class="text-muted small mb-0">Mean Corpuscular Hemoglobin Concentration: konsentrasi rata-rata hemoglobin dalam volume sel darah merah tertentu.</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card-custom p-4 h-100">
+        <div class="badge bg-primary-subtle text-primary p-2 rounded-3 mb-3 d-inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>
+        </div>
+        <h5 class="fw-bold mb-2">MCV</h5>
+        <p class="text-muted small mb-0">Mean Corpuscular Volume: ukuran atau volume rata-rata sel darah merah (mikrositik vs makrositik).</p>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

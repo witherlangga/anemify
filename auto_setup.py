@@ -7,12 +7,14 @@ Jalankan script ini sekali untuk setup database dan tabel
 import pymysql
 import sys
 import os
+import config
 
-# Konfigurasi Database
-DB_HOST = 'localhost'
-DB_USER = 'root'
-DB_PASSWORD = ''
-DB_NAME = 'anemiadb'
+# Konfigurasi Database dari config.py / .env
+DB_HOST = config.DB_HOST
+DB_PORT = config.DB_PORT
+DB_USER = config.DB_USER
+DB_PASSWORD = config.DB_PASSWORD
+DB_NAME = config.DB_NAME
 
 def print_header(text):
     print("\n" + "="*60)
@@ -28,6 +30,7 @@ def create_database():
         # Koneksi ke MySQL tanpa database
         conn = pymysql.connect(
             host=DB_HOST,
+            port=DB_PORT,
             user=DB_USER,
             password=DB_PASSWORD,
         )
@@ -35,7 +38,7 @@ def create_database():
         
         # Buat database
         cursor.execute(f"""
-            CREATE DATABASE IF NOT EXISTS {DB_NAME} 
+            CREATE DATABASE IF NOT EXISTS `{DB_NAME}` 
             CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         """)
         conn.commit()
@@ -53,6 +56,7 @@ def test_connection():
     try:
         conn = pymysql.connect(
             host=DB_HOST,
+            port=DB_PORT,
             user=DB_USER,
             password=DB_PASSWORD,
             database=DB_NAME
@@ -84,6 +88,7 @@ def check_dependencies():
         'flask_sqlalchemy': 'Flask-SQLAlchemy',
         'flask_login': 'Flask-Login',
         'pymysql': 'PyMySQL',
+        'dotenv': 'python-dotenv',
     }
     
     missing = []

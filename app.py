@@ -9,15 +9,16 @@ except Exception as e:
     Flask_available = False
     print(f"Flask import error: {e}")
 
+import config
 from utils import prediction as prediction_service
 
 if Flask_available:
     app = Flask(__name__)
     
     # Database configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/anemiadb'
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
+    app.config['SECRET_KEY'] = config.SECRET_KEY
     
     db = SQLAlchemy(app)
     login_manager = LoginManager()
@@ -44,6 +45,7 @@ if Flask_available:
         id = db.Column(db.Integer, primary_key=True)
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
         timestamp = db.Column(db.DateTime, default=lambda: __import__('datetime').datetime.now())
+        patient_name = db.Column(db.String(100), nullable=True, default='Pasien Noname')
         model_name = db.Column(db.String(50), nullable=False)
         gender = db.Column(db.Integer, nullable=False)
         hemoglobin = db.Column(db.Float, nullable=False)
@@ -65,88 +67,54 @@ else:
 
 
 if app is not None:
-    @app.route('/register', methods=['GET', 'POST'])
-    def register():
-        if current_user.is_authenticated:
-            return redirect(url_for('home'))
-        
-        if request.method == 'POST':
-            username = request.form.get('username')
-            email = request.form.get('email')
-            password = request.form.get('password')
-            confirm_password = request.form.get('confirm_password')
-            
-            if not username or not email or not password:
-                flash('Semua field harus diisi.', 'danger')
-                return redirect(url_for('register'))
-            
-            if password != confirm_password:
-                flash('Password tidak cocok.', 'danger')
-                return redirect(url_for('register'))
-            
-            if User.query.filter_by(username=username).first():
-                flash('Username sudah terdaftar.', 'danger')
-                return redirect(url_for('register'))
-            
-            if User.query.filter_by(email=email).first():
-                flash('Email sudah terdaftar.', 'danger')
-                return redirect(url_for('register'))
-            
-            user = User(username=username, email=email)
-            user.set_password(password)
-            db.session.add(user)
-            db.session.commit()
-            
-            flash('Registrasi berhasil! Silakan login.', 'success')
-            return redirect(url_for('login'))
-        
-        return render_template('register.html')
-    
-    
-    @app.route('/login', methods=['GET', 'POST'])
-    def login():
-        if current_user.is_authenticated:
-            return redirect(url_for('home'))
-        
-        if request.method == 'POST':
-            username = request.form.get('username')
-            password = request.form.get('password')
-            
-            user = User.query.filter_by(username=username).first()
-            
-            if user and user.check_password(password):
-                login_user(user)
-                flash(f'Selamat datang, {username}!', 'success')
-                return redirect(url_for('home'))
-            else:
-                flash('Username atau password salah.', 'danger')
-        
-        return render_template('login.html')
-    
-    
-    @app.route('/logout')
-    @login_required
-    def logout():
-        logout_user()
-        flash('Anda telah logout.', 'info')
-        return redirect(url_for('login'))
+    def get_default_user():
+        try:
+            # Auto update schema if patient_name column is missing in prediction_record table
+            try:
+                from sqlalchemy import inspect, text
+                inspector = inspect(db.engine)
+                if 'prediction_record' in inspector.get_table_names():
+                    columns = [c['name'] for c in inspector.get_columns('prediction_record')]
+                    if 'patient_name' not in columns:
+                        with db.engine.connect() as conn:
+                            conn.execute(text("ALTER TABLE prediction_record ADD COLUMN patient_name VARCHAR(100) DEFAULT 'Pasien Noname'"))
+                            conn.commit()
+            except Exception:
+                pass
+
+            user = User.query.first()
+            if not user:
+                user = User(username='Pengguna', email='user@anemify.local')
+                user.set_password('default_password')
+                db.session.add(user)
+                db.session.commit()
+            return user
+        except Exception:
+            return None
+
+    @app.route('/login')
+    @app.route('/register')
+    def redirect_to_home():
+        return redirect(url_for('home'))
     
     
     @app.route('/')
-    @login_required
     def home():
         return render_template('home.html', active='home')
 
 
     @app.route('/prediction', methods=['GET', 'POST'])
-    @login_required
     def prediction():
+        default_user = get_default_user()
+        user_id = default_user.id if default_user else 1
+
         if request.method == 'POST':
             import json
             import traceback
             from datetime import datetime
             
             try:
+                patient_name = request.form.get('patient_name', '').strip() or 'Pasien Noname'
                 model = request.form.get('model')
                 gender = int(request.form.get('gender'))
                 hemoglobin = float(request.form.get('hemoglobin') or 0)
@@ -166,7 +134,8 @@ if app is not None:
                         try:
                             proba_str = json.dumps(v['proba'])
                             pred_record = PredictionRecord(
-                                user_id=current_user.id,
+                                user_id=user_id,
+                                patient_name=patient_name,
                                 model_name=k,
                                 gender=gender,
                                 hemoglobin=hemoglobin,
@@ -181,7 +150,7 @@ if app is not None:
                             app.logger.exception('Error saving prediction for all models')
                     
                     db.session.commit()
-                    return render_template('prediction.html', active='prediction', results=results, results_all=True)
+                    return render_template('prediction.html', active='prediction', results=results, results_all=True, patient_name=patient_name)
                 else:
                     pred = prediction_service.predict(model, gender, hemoglobin, mch, mchc, mcv)
                     if model == 'KNN':
@@ -200,7 +169,8 @@ if app is not None:
                     try:
                         proba_str = json.dumps(proba)
                         pred_record = PredictionRecord(
-                            user_id=current_user.id,
+                            user_id=user_id,
+                            patient_name=patient_name,
                             model_name=model,
                             gender=gender,
                             hemoglobin=hemoglobin,
@@ -215,7 +185,7 @@ if app is not None:
                     except Exception as e:
                         app.logger.exception('Error saving prediction')
                     
-                    return render_template('prediction.html', active='prediction', results={'model':model,'label':label,'proba':proba}, results_all=False)
+                    return render_template('prediction.html', active='prediction', results={'model':model,'label':label,'proba':proba}, results_all=False, patient_name=patient_name)
             except Exception as e:
                 app.logger.exception('Prediction route failed')
                 error_message = str(e)
@@ -225,24 +195,32 @@ if app is not None:
 
 
     @app.route('/dashboard')
-    @login_required
     def dashboard():
-        # Get predictions for current user from database
-        predictions = PredictionRecord.query.filter_by(user_id=current_user.id).order_by(PredictionRecord.timestamp.desc()).all()
+        default_user = get_default_user()
+        user_id = default_user.id if default_user else 1
+
+        # Query predictions for all users or default user from database
+        predictions = PredictionRecord.query.order_by(PredictionRecord.timestamp.desc()).all()
         
         history = []
         for pred in predictions:
             import json
             try:
                 proba_dict = json.loads(pred.probability_proba) if pred.probability_proba else {}
-                proba_str = ', '.join([f"{k}: {v:.2%}" for k, v in proba_dict.items()])
+                if isinstance(proba_dict, list):
+                    proba_str = f"Berisiko: {proba_dict[1]:.1%}, Normal: {proba_dict[0]:.1%}"
+                elif isinstance(proba_dict, dict):
+                    proba_str = ', '.join([f"{k}: {v:.2%}" for k, v in proba_dict.items()])
+                else:
+                    proba_str = str(proba_dict)
             except:
                 proba_str = pred.probability_proba or 'N/A'
             
             history.append({
                 'timestamp': pred.timestamp.strftime('%Y-%m-%d %H:%M:%S') if pred.timestamp else '',
+                'patient_name': getattr(pred, 'patient_name', None) or 'Pasien Noname',
                 'model': pred.model_name,
-                'gender': pred.gender,
+                'gender': 'Laki-laki' if pred.gender == 1 else 'Perempuan',
                 'hemoglobin': pred.hemoglobin,
                 'mch': pred.mch,
                 'mchc': pred.mchc,
@@ -254,21 +232,18 @@ if app is not None:
         return render_template('dashboard.html', active='dashboard', history=history)
 
     @app.route('/dashboard/download')
-    @login_required
     def download_history():
         import io, csv, json, datetime
 
-        # Query predictions for current user
-        predictions = PredictionRecord.query.filter_by(user_id=current_user.id).order_by(PredictionRecord.timestamp.desc()).all()
+        predictions = PredictionRecord.query.order_by(PredictionRecord.timestamp.desc()).all()
 
         si = io.StringIO()
         cw = csv.writer(si)
-        cw.writerow(['timestamp','model','gender','hemoglobin','mch','mchc','mcv','prediction','probability'])
+        cw.writerow(['timestamp','patient_name','model','gender','hemoglobin','mch','mchc','mcv','prediction','probability'])
 
         for pred in predictions:
             try:
                 proba_dict = json.loads(pred.probability_proba) if pred.probability_proba else {}
-                # If proba_dict is mapping label->value, format percentages
                 if isinstance(proba_dict, dict):
                     proba_str = '; '.join([f"{k}:{v:.4f}" if isinstance(v, float) else f"{k}:{v}" for k, v in proba_dict.items()])
                 else:
@@ -277,67 +252,19 @@ if app is not None:
                 proba_str = pred.probability_proba or ''
 
             ts = pred.timestamp.strftime('%Y-%m-%d %H:%M:%S') if pred.timestamp else ''
-            cw.writerow([ts, pred.model_name, pred.gender, pred.hemoglobin, pred.mch, pred.mchc, pred.mcv, pred.prediction_label, proba_str])
+            pname = getattr(pred, 'patient_name', None) or 'Pasien Noname'
+            cw.writerow([ts, pname, pred.model_name, 'Laki-laki' if pred.gender == 1 else 'Perempuan', pred.hemoglobin, pred.mch, pred.mchc, pred.mcv, pred.prediction_label, proba_str])
 
         output = make_response(si.getvalue())
-        fname = f"history_{current_user.username}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        fname = f"anemify_history_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         output.headers['Content-Disposition'] = f'attachment; filename={fname}'
         output.headers['Content-Type'] = 'text/csv; charset=utf-8'
         return output
 
 
     @app.route('/about')
-    @login_required
     def about():
         return render_template('about.html', active='about')
-
-
-    @app.route('/profile')
-    @login_required
-    def profile():
-        return render_template('profile.html', active='profile')
-
-
-    @app.route('/profile/edit', methods=['GET', 'POST'])
-    @login_required
-    def edit_profile():
-        import os
-        from werkzeug.utils import secure_filename
-
-        UPLOAD_FOLDER = os.path.join('static', 'uploads')
-        ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'gif'}
-
-        if request.method == 'POST':
-            username = request.form.get('username')
-            email = request.form.get('email')
-            file = request.files.get('profile_image')
-
-            if username:
-                current_user.username = username
-            if email:
-                current_user.email = email
-
-            if file and file.filename:
-                filename = secure_filename(file.filename)
-                ext = filename.rsplit('.', 1)[-1].lower()
-                if ext in ALLOWED_EXT:
-                    save_path = os.path.join(UPLOAD_FOLDER, f"user_{current_user.id}_{filename}")
-                    file.save(save_path)
-                    current_user.profile_image = save_path.replace('\\', '/')
-                else:
-                    flash('Tipe file tidak diizinkan.', 'danger')
-                    return redirect(url_for('edit_profile'))
-
-            try:
-                db.session.commit()
-                flash('Profil diperbarui.', 'success')
-            except Exception as e:
-                db.session.rollback()
-                flash('Gagal memperbarui profil.', 'danger')
-
-            return redirect(url_for('profile'))
-
-        return render_template('edit_profile.html', active='profile')
 
 
     if __name__ == '__main__':

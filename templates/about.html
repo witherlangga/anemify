@@ -1,22 +1,100 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Tentang Aplikasi</h1>
-  <p class="text-muted">Informasi proyek dan pengembang</p>
-  <hr/>
-
-  <h3>Deskripsi Aplikasi</h3>
-  <p>Aplikasi ini digunakan untuk memprediksi risiko anemia berdasarkan parameter darah menggunakan algoritma Machine Learning.</p>
-
-  <h3>Pengembang</h3>
-  <div class="row">
-    <div class="col-md-4"><h5>Anggota 1</h5><p>NIM: 2301010</p></div>
-    <div class="col-md-4"><h5>Anggota 2</h5><p>NIM: 2301010</p></div>
-    <div class="col-md-4"><h5>Anggota 3</h5><p>NIM: 2301010</p></div>
-  </div>
-  <div class="row mt-3">
-    <div class="col-md-4"><h5>Anggota 4</h5><p>NIM: 2301010</p></div>
-    <div class="col-md-4"><h5>Anggota 5</h5><p>NIM: 2301010</p></div>
-    <div class="col-md-4"><h5>Anggota 6</h5><p>NIM: 2301010</p></div>
+<div class="max-w-4xl mx-auto py-2">
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <span class="badge bg-cyan-subtle text-primary border border-info-subtle px-3 py-2 rounded-pill font-heading mb-3 d-inline-flex align-items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      Informasi Proyek
+    </span>
+    <h1 class="display-6 font-heading fw-bold text-slate-900 mb-3">Tentang Platform Anemify</h1>
+    <p class="lead text-muted max-w-xl mx-auto fs-6">
+      Solusi cerdas prediksi risiko anemia berbasis Machine Learning untuk membantu analisis awal indikator kesehatan hematologi.
+    </p>
   </div>
 
+  <!-- Description Card -->
+  <div class="card-custom p-4 p-md-5 bg-white mb-5">
+    <h3 class="h4 font-heading text-slate-900 mb-3 d-flex align-items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Latar Belakang & Metodologi
+    </h3>
+    <p class="text-muted mb-3 leading-relaxed">
+      Anemify dikembangkan sebagai alat bantu diagnostik prediktif yang memanfaatkan dataset laboratorium klinis. Dengan mengevaluasi 4 nilai parameter utama—yaitu <strong>Hemoglobin (Hb)</strong>, <strong>MCH</strong>, <strong>MCHC</strong>, dan <strong>MCV</strong>—sistem mampu mengklasifikasikan kecenderungan kondisi pasien secara efisien.
+    </p>
+    <p class="text-muted mb-0 leading-relaxed">
+      Terdapat 3 model machine learning yang diintegrasikan: <strong>K-Nearest Neighbors (KNN)</strong> untuk pendekatan klastering berbasis kedekatan nilai, <strong>Random Forest</strong> untuk pohon keputusan ensembel yang tangguh, serta <strong>Voting Classifier</strong> yang menggabungkan konsensus beberapa algoritma untuk memberikan prediksi terbaik.
+    </p>
+  </div>
+
+  <!-- Team Section -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h3 class="h4 font-heading text-slate-900 mb-0">Tim Pengembang (Data Mining)</h3>
+      <span class="badge bg-light text-dark border px-3 py-1.5 rounded-pill font-heading">Kelompok Proyek</span>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 1</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 2</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 3</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 4</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 5</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom p-4 bg-white text-center h-100">
+          <div class="mx-auto rounded-circle bg-cyan-subtle text-primary mb-3 d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1">Anggota 6</h5>
+          <p class="text-muted small mb-0 font-mono">NIM: 2301010</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

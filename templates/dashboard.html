@@ -1,46 +1,108 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>History Prediksi</h1>
-  <div class="d-flex justify-content-between align-items-center">
-    <p class="text-muted mb-0">Riwayat prediksi untuk akun: <strong>{{ current_user.username }}</strong></p>
-    <a href="{{ url_for('download_history') }}" class="btn btn-black">Download CSV</a>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h2 font-heading text-slate-900 mb-1">Riwayat Prediksi Medis</h1>
+    <p class="text-muted mb-0">Daftar rekaman catatan evaluasi sampel laboratorium yang telah diproses.</p>
   </div>
-  <hr/>
-  {% if history and history|length > 0 %}
+  <a href="{{ url_for('download_history') }}" class="btn-custom-outline text-decoration-none py-2.5 px-4">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+    Unduh Laporan CSV
+  </a>
+</div>
+
+{% if history and history|length > 0 %}
+  <!-- Stats Cards Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card-custom p-4 bg-white d-flex align-items-center gap-3">
+        <div class="p-3 rounded-3 bg-cyan-subtle text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div>
+          <div class="text-muted small font-heading">Total Tes Diproses</div>
+          <div class="fs-3 fw-bold text-slate-900 font-heading">{{ history|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card-custom p-4 bg-white d-flex align-items-center gap-3">
+        <div class="p-3 rounded-3 bg-success-subtle text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div class="text-muted small font-heading">Waktu Tes Terakhir</div>
+          <div class="fs-6 fw-bold text-slate-900 font-heading">{{ history[0].timestamp[:10] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card-custom p-4 bg-white d-flex align-items-center gap-3">
+        <div class="p-3 rounded-3 bg-warning-subtle text-warning">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div>
+          <div class="text-muted small font-heading">Status Sistem</div>
+          <div class="fs-6 fw-bold text-slate-900 font-heading">Siap & Terhubung</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Table Card -->
+  <div class="card-custom p-0 bg-white overflow-hidden">
     <div class="table-responsive">
-      <table class="table table-sm table-striped">
-        <thead class="table-dark">
+      <table class="table align-middle mb-0">
+        <thead class="bg-light border-bottom">
           <tr>
-            <th>Waktu</th>
-            <th>Model</th>
-            <th>Gender</th>
-            <th>Hemoglobin</th>
-            <th>MCH</th>
-            <th>MCHC</th>
-            <th>MCV</th>
-            <th>Prediksi</th>
-            <th>Probabilitas</th>
+            <th class="py-3 px-4 text-muted small font-heading text-uppercase">Waktu</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">Nama Pasien</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">Model ML</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">Gender</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">Hb (g/dL)</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">MCH / MCHC / MCV</th>
+            <th class="py-3 px-3 text-muted small font-heading text-uppercase">Prediksi Diagnostik</th>
+            <th class="py-3 px-4 text-muted small font-heading text-uppercase">Probabilitas</th>
           </tr>
         </thead>
         <tbody>
           {% for row in history %}
-            <tr>
-              <td>{{ row.timestamp }}</td>
-              <td><span class="badge bg-dark">{{ row.model }}</span></td>
-              <td>{{ row.gender }}</td>
-              <td>{{ row.hemoglobin }}</td>
-              <td>{{ row.mch }}</td>
-              <td>{{ row.mchc }}</td>
-              <td>{{ row.mcv }}</td>
-              <td><strong>{{ row.prediction }}</strong></td>
-              <td><small>{{ row.probability }}</small></td>
+            {% set is_anemia = 'anemia' in row.prediction|lower or 'risiko' in row.prediction|lower %}
+            <tr class="border-bottom">
+              <td class="py-3 px-4 font-mono small text-slate-600">{{ row.timestamp }}</td>
+              <td class="py-3 px-3 text-slate-900 fw-semibold">{{ row.patient_name }}</td>
+              <td class="py-3 px-3">
+                <span class="badge bg-light text-dark border font-heading px-2.5 py-1 rounded-2">{{ row.model }}</span>
+              </td>
+              <td class="py-3 px-3 text-slate-700 fw-medium">{{ row.gender }}</td>
+              <td class="py-3 px-3 fw-bold text-slate-900">{{ row.hemoglobin }}</td>
+              <td class="py-3 px-3 text-muted small font-mono">
+                {{ row.mch }} / {{ row.mchc }} / {{ row.mcv }}
+              </td>
+              <td class="py-3 px-3">
+                <span class="badge {% if is_anemia %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %} px-3 py-1.5 rounded-pill font-heading">
+                  {{ row.prediction }}
+                </span>
+              </td>
+              <td class="py-3 px-4 small text-slate-600 font-mono">{{ row.probability }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    <p class="text-muted mt-3">Total prediksi: <strong>{{ history|length }}</strong></p>
-  {% else %}
-    <div class="alert alert-info">Belum ada riwayat prediksi. Lakukan prediksi pada halaman Prediction.</div>
-  {% endif %}
+  </div>
+{% else %}
+  <div class="card-custom p-5 bg-white text-center">
+    <div class="p-4 rounded-circle bg-cyan-subtle text-primary mb-3 d-inline-flex align-items-center justify-content-center" style="width:72px; height:72px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+    </div>
+    <h4 class="font-heading text-slate-900 mb-2">Belum Ada Riwayat Prediksi</h4>
+    <p class="text-muted max-w-sm mx-auto mb-4">Silakan lakukan pengujian parameter laboratorium pertama Anda di halaman prediksi.</p>
+    <a href="/prediction" class="btn-custom-primary text-decoration-none px-4 py-2.5 mx-auto d-inline-flex">
+      Buka Halaman Prediksi
+    </a>
+  </div>
+{% endif %}
 {% endblock %}
