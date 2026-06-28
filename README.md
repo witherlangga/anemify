@@ -1,20 +1,19 @@
 # 🩺 Anemify - Anemia Risk Prediction System
 
-**Anemify** adalah aplikasi web interaktif berbasis **Flask** dan **Machine Learning** yang dirancang untuk menganalisis dan memprediksi risiko anemia berdasarkan indikator medis darah (hematologi). Aplikasi ini dilengkapi dengan sistem manajemen pengguna, perbandingan multi-model ML, riwayat prediksi terintegrasi, serta fitur ekspor data.
+**Anemify** adalah aplikasi web interaktif berbasis **Flask** dan **Machine Learning** yang dirancang untuk menganalisis dan memprediksi risiko anemia berdasarkan indikator medis darah (hematologi). Aplikasi ini menawarkan analisis multi-model, riwayat prediksi, serta fitur ekspor data.
 
 ---
 
 ## ✨ Fitur Utama
 
-- 🔐 **Autentikasi Pengguna**: Sistem pendaftaran (Register) dan masuk (Login) yang aman dengan enkripsi kata sandi.
+- 🌐 **Akses Terbuka**: Tidak memerlukan login atau pendaftaran untuk menggunakan fitur prediksi dan dashboard.
 - 🤖 **Multi-Model Machine Learning**: Prediksi risiko anemia menggunakan 3 algoritma ML berbeda:
   - **KNN (K-Nearest Neighbors)**
   - **Random Forest Classifier**
   - **Voting Classifier** (Ensemble Learning)
 - ⚖️ **Mode Komparasi ("All Models")**: Bandingkan hasil prediksi dan tingkat probabilitas dari ketiga model sekaligus dalam satu kali analisis.
-- 📊 **Dashboard Riwayat Prediksi**: Menyimpan seluruh catatan medis dan hasil analisis prediksi per akun secara personal.
-- 📥 **Export Data CSV**: Ekspor seluruh riwayat analisis ke dalam file `.csv` untuk keperluan dokumentasi medis.
-- 👤 **Manajemen Profil**: Pengguna dapat memperbarui informasi akun serta mengunggah foto profil.
+- 📊 **Dashboard Riwayat Prediksi**: Menampilkan semua riwayat prediksi yang tersimpan di database.
+- 📥 **Export Data CSV**: Ekspor riwayat analisis ke dalam file `.csv` untuk keperluan dokumentasi.
 
 ---
 
@@ -34,7 +33,7 @@ Aplikasi ini membutuhkan 5 indikator medis utama untuk melakukan analisis:
 
 ## 🛠️ Teknologi & Dependencies
 
-- **Backend**: Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login
+- **Backend**: Python 3.10+, Flask, Flask-SQLAlchemy
 - **Database**: MySQL / MariaDB (via PyMySQL)
 - **Machine Learning & Data Processing**: Scikit-Learn, Pandas, NumPy, Joblib
 - **Visualisasi & Utilities**: Matplotlib, Seaborn, Pillow (PIL), Python-Dotenv
@@ -77,7 +76,7 @@ anemify/
 
 ### 2. Clone Repository
 ```bash
-git clone https://github.com/your-username/anemify.git
+git clone https://github.com/iterlangga/anemify.git
 cd anemify
 ```
 
@@ -133,20 +132,23 @@ Akses aplikasi melalui peramban web di: `http://127.0.0.1:5000`
 
 ## 💡 Cara Penggunaan
 
-1. Buka aplikasi di browser dan masuk ke halaman **Register** untuk membuat akun baru.
-2. Silakan **Login** menggunakan nama pengguna dan kata sandi yang telah didaftarkan.
-3. Buka menu **Prediksi**, masukkan indikator medis darah (Gender, Hemoglobin, MCH, MCHC, MCV).
-4. Pilih algoritma model yang diinginkan (KNN, Random Forest, Voting Classifier, atau All Models) lalu klik **Prediksi**.
-5. Lihat hasil estimasi risiko anemia beserta persentase probabilitasnya.
-6. Pantau seluruh data riwayat pemeriksaan melalui menu **Dashboard**.
-7. Klik tombol **Export CSV** di Dashboard untuk mengunduh laporan riwayat medis.
-8. Perbarui informasi diri dan pasfoto melalui menu **Profil**.
+1. Buka aplikasi di browser setelah menjalankan `python app.py`.
+2. Buka menu **Prediksi**, lalu masukkan indikator medis darah (Gender, Hemoglobin, MCH, MCHC, MCV).
+3. Pilih algoritma model yang diinginkan (KNN, Random Forest, Voting Classifier, atau All Models) lalu klik **Prediksi**.
+4. Lihat hasil estimasi risiko anemia beserta persentase probabilitasnya.
+5. Pantau seluruh data riwayat pemeriksaan melalui menu **Dashboard**.
+6. Klik tombol **Export CSV** di Dashboard untuk mengunduh laporan riwayat medis.
 
 ---
 
 ## 👥 Tim Pengembang
 
 - **Erlangga Syafutra** - 2301010192
+- **Rahmat Nassaruddin** - 2301010178
+- **Nurhidayatul Qorymah** - 2301010149
+- **Dahliati** - 2301010151
+- **Rini Ansari** - 2301010158
+- **Riska Sari Septiani** - 2301010209
 
 ---
 
